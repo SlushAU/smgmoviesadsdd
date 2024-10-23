@@ -3,22 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix Styled Menu</title>
+    <title>SMG Movies</title>
     <style>
         body {
             background-color: #141414;
             color: #fff;
             font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s, font-size 0.3s;
+            height: 100vh; /* Make body full height */
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1522202176988-66273c2e8b53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(5px);
+            z-index: -1;
+            transition: filter 0.3s;
         }
 
         .menu {
             text-align: center;
+            z-index: 1;
+            max-height: 80vh; /* Limit menu height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 20px;
+            position: relative;
         }
 
         h1 {
@@ -27,48 +43,224 @@
             text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
         }
 
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #fff;
+        }
+
+        .settings-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: rgba(229, 9, 20, 0.8);
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            padding: 10px;
+        }
+
+        .settings-menu button,
+        .settings-menu select {
+            padding: 10px;
+            background-color: transparent;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .settings-menu button:hover,
+        .settings-menu select:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .genre {
+            margin-top: 40px;
+        }
+
+        .genre h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
         .app-container {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap; /* Allows items to wrap to the next line */
-            gap: 20px; /* Space between apps */
+            flex-wrap: wrap;
+            gap: 20px;
             padding: 20px;
         }
 
         .app {
-            background-color: #e50914;
+            background-color: rgba(229, 9, 20, 0.8);
             padding: 20px;
             border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
             font-size: 1.2em;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 150px;
-            width: 150px; /* Fixed width for uniformity */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            width: 150px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transform: translateX(-100%);
+            opacity: 0;
+            animation: slide-in 0.5s forwards;
         }
 
         .app:hover {
-            background-color: #f40612;
+            transform: scale(1.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .app::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .app:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes slide-in {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="background"></div>
     <div class="menu">
-        <h1>App Menu</h1>
-        <div class="app-container">
-            <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/519182')">Decpicable Me</div>
-            <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/49519')">The Croods</div>
-            <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/293660')">Deadpool</div>
-            <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/580489')">Venom | LTBC</div>
-            <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/533535')">Deadpool And Wolverine</div>
-')">App 4</div>
+        <h1>SMG Movies</h1>
+
+        <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+        <div class="settings-menu" id="settingsMenu">
+            <button id="toggleTheme">Switch to Light Mode</button>
+            <button id="resetSettings">Reset Settings</button>
+            <label for="fontSize">Font Size:</label>
+            <select id="fontSize">
+                <option value="1">Normal</option>
+                <option value="1.2">Large</option>
+                <option value="1.5">Extra Large</option>
+            </select>
+            <label for="backgroundSelect">Background:</label>
+            <select id="backgroundSelect">
+                <option value="default">Lake</option>
+                <option value="bg1">Anime</option>
+                <option value="bg2">Forest</option>
+            </select>
+        </div>
+
+        <div class="genre">
+            <h2>Animation</h2>
+            <div class="app-container">
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/519182')">Despicable Me</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/49519')">The Croods</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/1022789')">Inside Out 2</div>			
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/2062')">Ratatouille</div>					
+            </div>
+        </div>
+
+        <div class="genre">
+            <h2>Action</h2>
+            <div class="app-container">
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/293660')">Deadpool</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/580489')">Venom | LTBC</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/533535')">Deadpool And Wolverine</div>
+            </div>
+        </div>
+
+        <div class="genre">
+            <h2>Fast And Furious Collection</h2>
+            <div class="app-container">
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/168259')">Furious 7</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/337339')">Fate Of The Furious</div>
+                <div class="app" onclick="openApp('https://vidsrc.pro/embed/movie/384018')">Fast And Furious | Hobbs And Shaw</div>
+                <!-- Add more genres as needed -->
+            </div>
         </div>
     </div>
 
     <script>
+        const toggleButton = document.getElementById('toggleTheme');
+        const resetButton = document.getElementById('resetSettings');
+        const fontSizeSelect = document.getElementById('fontSize');
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const settingsMenu = document.getElementById('settingsMenu');
+        let isDarkMode = true;
+
+        toggleButton.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            updateTheme();
+        });
+
+        resetButton.addEventListener('click', resetSettings);
+
+        fontSizeSelect.addEventListener('change', () => {
+            document.body.style.fontSize = fontSizeSelect.value;
+        });
+
+        backgroundSelect.addEventListener('change', updateBackground);
+
+        function updateTheme() {
+            if (isDarkMode) {
+                document.body.style.backgroundColor = '#141414';
+                document.body.style.color = '#fff';
+                document.querySelector('.background').style.filter = 'blur(5px)';
+                toggleButton.textContent = 'Switch to Light Mode';
+            } else {
+                document.body.style.backgroundColor = '#ffffff';
+                document.body.style.color = '#000';
+                document.querySelector('.background').style.filter = 'none';
+                toggleButton.textContent = 'Switch to Dark Mode';
+            }
+        }
+
+        function resetSettings() {
+            isDarkMode = true;
+            document.body.style.fontSize = '1em';
+            fontSizeSelect.value = '1';
+            backgroundSelect.value = 'default';
+            updateTheme();
+        }
+
+        function updateBackground() {
+            const selectedValue = backgroundSelect.value;
+            if (selectedValue === 'bg1') {
+                document.querySelector('.background').style.backgroundImage = "url('https://t3.ftcdn.net/jpg/05/83/54/76/360_F_583547620_zQPFcEnoODqQKuNMEG8LUU8RcHxiKmFs.jpg')";
+            } else if (selectedValue === 'bg2') {
+                document.querySelector('.background').style.backgroundImage = "url('https://c4.wallpaperflare.com/wallpaper/410/867/750/vector-forest-sunset-forest-sunset-forest-wallpaper-preview.jpg')";
+            } else {
+                document.querySelector('.background').style.backgroundImage = "url('https://img.freepik.com/premium-photo/aigenerated-captivating-mountain-lake-view_1053688-186.jpg?semt=ais_hybrid')";
+            }
+        }
+
+        function toggleSettings() {
+            settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
+        }
+
         function openApp(url) {
             const newWindow = window.open('about:blank', '_blank');
             newWindow.document.write(`
@@ -87,18 +279,6 @@
             `);
             newWindow.document.close();
         }
-
-        // Animation effect
-        document.querySelectorAll('.app').forEach(app => {
-            app.addEventListener('mouseover', () => {
-                app.style.transform = 'scale(1.05)';
-                app.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
-            });
-            app.addEventListener('mouseout', () => {
-                app.style.transform = 'scale(1)';
-                app.style.boxShadow = 'none';
-            });
-        });
     </script>
 </body>
 </html>
